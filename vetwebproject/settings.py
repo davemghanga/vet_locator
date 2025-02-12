@@ -42,9 +42,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #local apps
     'accounts.apps.AccountsConfig',
+
+    #Third party Apps
     'leaflet',
     'django.contrib.gis',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -138,4 +144,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
+CRISPY_ALLOWED_TEMPLATE_PACK = 'bootstrap5'
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (0.0236, 37.9062),  # Kenya's approximate center
+    'DEFAULT_ZOOM': 6,  # Zoom level to show most of Kenya
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'SCALE': 'both',
+    'ATTRIBUTION_PREFIX': 'Powered by Django-Leaflet',
+}

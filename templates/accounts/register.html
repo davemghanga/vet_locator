@@ -1,0 +1,74 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% load leaflet_tags %}  <!-- Add this -->
+
+{% block title %}Register - Vet Locator{% endblock title %}
+
+{% block head %}  <!-- Add this block -->
+    {{ block.super }}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    <style>
+        .leaflet-container {  /* Add custom CSS for map container */
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock head %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">  <!-- Made this wider to accommodate the map -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Sign Up</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.addEventListener("map:init", function (e) {
+        var detail = e.detail;
+        var map = detail.map;
+        
+        // Add default marker for Kenya
+        var defaultLocation = [0.0236, 37.9062];
+        var defaultMarker = L.marker(defaultLocation).addTo(map);
+        
+        // Set the initial form value
+        document.getElementById('id_location').value = 
+            'POINT(' + defaultLocation[1] + ' ' + defaultLocation[0] + ')';
+        
+        // Add a marker when clicking on the map
+        map.on('click', function(e) {
+            // Clear existing markers
+            map.eachLayer((layer) => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+            
+            // Add new marker
+            L.marker(e.latlng).addTo(map);
+            
+            // Update the form field
+            document.getElementById('id_location').value = 
+                'POINT(' + e.latlng.lng + ' ' + e.latlng.lat + ')';
+        });
+    });
+</script>
+{% endblock content %}

@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.gis.forms import PointField
+from leaflet.forms.widgets import LeafletWidget
 from .models import CustomUser
 
 class CustomUserCreationForm(forms.ModelForm):
@@ -7,10 +9,14 @@ class CustomUserCreationForm(forms.ModelForm):
     
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+    location = PointField(widget=LeafletWidget())
 
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'phone_number', 'user_type', 'location']
+        widgets = {
+            'location': LeafletWidget(),
+        }
 
     def clean_password2(self):
         """Ensure both passwords match."""
@@ -43,14 +49,19 @@ class CustomUserChangeForm(forms.ModelForm):
     """Form for updating users (used in Django Admin)."""
     
     password = ReadOnlyPasswordHashField()
+    location = PointField(widget=LeafletWidget())
 
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'phone_number', 'user_type', 'location', 'is_active', 'is_staff']
+        widgets = {
+            'location': LeafletWidget(),
+        }
 
     def clean_password(self):
         """Return the initial password."""
         return self.initial["password"]
+
 
 class LoginForm(forms.Form):
     email = forms.EmailField()
