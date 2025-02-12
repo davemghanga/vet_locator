@@ -1,6 +1,153 @@
-{% extends "_base.html" %}
-{% block title %}Log In or Sign Up{% endblock title %}
-{% block content%}
-  <h2>HomePage</h2>
-{% endblock content%}
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Vet Locator</title>
+    <style>
+        body, html {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
 
+        .page-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2vh 4vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .text-section {
+            flex: 1;
+            max-width: 45%;
+        }
+
+        .nav-section {
+            width: 220px; /* Fixed width for navigation */
+            background-color: #007bff;
+            padding: 1rem; /* Reduced padding */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align links to the start */
+            justify-content: flex-start; /* Align to the top */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 100%; /* Make it take full height */
+        }
+
+        .nav-link {
+            color: white !important;
+            text-align: left; /* Align text to the left */
+            padding: 0.5rem 1rem; /* Consistent padding */
+            width: 100%;
+            margin: 0.2rem 0; /* Margin for spacing */
+            font-size: 1rem; /* Adjusted font size */
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .dog-image {
+            height: 90vh; /* Increased height */
+            width: auto;
+            max-width: 60%; /* Increased max-width */
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .dog-image:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 3vw;
+            line-height: 1.2;
+            margin-bottom: 2vh;
+            color: #343a40; /* Darker text for contrast */
+        }
+
+        .text-muted {
+            font-size: 1.2rem;
+            margin-bottom: 3vh;
+            color: #6c757d; /* Darker muted text for better readability */
+        }
+
+        .btn-lg {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .dog-image {
+                height: 75vh; /* Adjusted for medium screens */
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+                text-align: center;
+                overflow-y: auto;
+            }
+
+            .dog-image {
+                height: auto;
+                width: 80%; /* Adjusted width for smaller screens */
+                max-width: none;
+                margin-top: 2vh;
+            }
+
+            .text-section {
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <main class="main-content">
+            <div class="text-section">
+                <h1 class="fw-bold">Doing The Right Thing, At The Right Time</h1>
+                <p class="text-muted">Helping pet owners connect with reliable veterinarians quickly and easily.</p>
+                <a href="#" class="btn btn-primary btn-lg">Learn More</a>
+            </div>
+            <img src="{% static 'images/dogprofile.jpeg' %}" alt="Happy Dog" class="dog-image">
+        </main>
+
+        <nav class="nav-section">
+            <a class="nav-link" href="#">Find a Vet</a>
+            <a class="nav-link" href="#">Appointments</a>
+            <a class="nav-link" href="#">Services</a>
+            <a class="nav-link" href="#">Contact</a>
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+            <a class="nav-link" href="{% url 'register' %}">Register</a>
+        </nav>
+    </div>
+</body>
+</html>
