@@ -1,0 +1,108 @@
+{% extends "_base.html" %}
+{% load crispy_forms_tags %}
+{% load leaflet_tags %}
+
+{% block title %}Edit Profile - Vet Locator{% endblock title %}
+
+{% block head %}
+    {{ block.super }}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    <style>
+        .leaflet-container {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .edit-profile-container {
+            background-color: #f4fcfb; /* Soft background color */
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .edit-profile-header {
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock head %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 edit-profile-container">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Edit Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="edit-profile-header text-center">
+                        <h5>Update Your Information</h5>
+                        <p>Modify your details and location below.</p>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'profile' %}" class="btn btn-secondary">Back to Profile</a>
+                    </div>
+
+                    <!-- Delete Account Section -->
+                    <div class="text-center mt-3" id="delete-section">
+                        <button id="delete-button" class="btn btn-danger">Delete My Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.addEventListener("map:init", function (e) {
+        var detail = e.detail;
+        var map = detail.map;
+
+        // Get user's saved location (if available)
+        var lat = "{{ user.location.y|default:0.0236 }}";
+        var lon = "{{ user.location.x|default:37.9062 }}";
+
+        var userLocation = [lat, lon];
+
+        // Add marker for user's location
+        var marker = L.marker(userLocation, { draggable: true }).addTo(map);
+        map.setView(userLocation, 10);
+
+        // Update the form field with the current location
+        document.getElementById('id_location').value = 'POINT(' + lon + ' ' + lat + ')';
+
+        // When the user drags the marker, update the form field
+        marker.on("dragend", function (e) {
+            var newLat = marker.getLatLng().lat;
+            var newLon = marker.getLatLng().lng;
+            document.getElementById('id_location').value = 'POINT(' + newLon + ' ' + newLat + ')';
+        });
+
+        // Allow user to click on map to change location
+        map.on("click", function (e) {
+            marker.setLatLng(e.latlng);
+            document.getElementById('id_location').value = 'POINT(' + e.latlng.lng + ' ' + e.latlng.lat + ')';
+        });
+    });
+
+    // Replace delete button with confirmation
+    document.getElementById("delete-button").addEventListener("click", function () {
+        var deleteSection = document.getElementById("delete-section");
+        deleteSection.innerHTML = `
+            <p class="text-danger"><strong>Are you sure you want to delete your account? This action cannot be undone.</strong></p>
+            <a href="{% url 'delete_profile' %}" class="btn btn-danger">Yes, Delete My Account</a>
+            <button id="cancel-delete" class="btn btn-secondary">Cancel</button>
+        `;
+
+        document.getElementById("cancel-delete").addEventListener("click", function () {
+            deleteSection.innerHTML = `<button id="delete-button" class="btn btn-danger">Delete My Account</button>`;
+        });
+    });
+</script>
+
+{% endblock content %}

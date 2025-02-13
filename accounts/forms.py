@@ -60,3 +60,12 @@ class CustomUserChangeForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.EmailField(label="Email Address")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+
+class UserProfileForm(forms.ModelForm):
+    """Form for users to update their profile (used in the frontend)."""
+    
+    location = PointField(widget=LeafletWidget(), required=False)  # Make location optional
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'phone_number', 'location']

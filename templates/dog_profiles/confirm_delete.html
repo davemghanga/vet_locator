@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+
+{% block title %}Delete Dog Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 border-0 rounded-4">
+        <h2 class="text-danger">Confirm Deletion</h2>
+        <p>Are you sure you want to delete the dog profile for <strong>{{ profile.name }}</strong>? This action cannot be undone.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'dog_profile_detail' profile.id %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

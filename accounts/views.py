@@ -4,8 +4,10 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, View
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import LoginForm, CustomUserCreationForm
+from .forms import LoginForm, CustomUserCreationForm, UserProfileForm
 from geopy.geocoders import Nominatim
+from django.contrib.auth.hashers import check_password
+from pages.models import DogProfile
 
 User = get_user_model()
 
@@ -43,18 +45,19 @@ class LoginView(View):
                 messages.error(request, "Invalid email or password.")
         return render(request, 'accounts/login.html', {'form': form})
 
-@login_required
+@login_required(login_url='login')
 def vet_dashboard(request):
     return render(request, "accounts/vet_dashboard.html")
 
-@login_required
+@login_required(login_url='login')
 def owner_dashboard(request):
-    return render(request, "accounts/owner_dashboard.html")
+    profiles = DogProfile.objects.filter(owner=request.user)
+    return render(request, "accounts/owner_dashboard.html", {"profiles": profiles})
 
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect(reverse_lazy('login'))
+    return redirect(reverse_lazy(''))
 
 def get_location_name(coordinates):
     geolocator = Nominatim(user_agent="vet_locator")
@@ -64,7 +67,7 @@ def get_location_name(coordinates):
     except Exception:
         return "Unknown Location"
 
-@login_required
+@login_required(login_url='login')
 def profile_view(request):
     user = request.user
     location_name = "Unknown Location"
@@ -79,3 +82,37 @@ def profile_view(request):
             location_name = "Invalid location data."
 
     return render(request, "accounts/profile_details.html", {"location_name": location_name})
+
+@login_required(login_url='login')
+def edit_profile(request):
+    user = request.user
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to profile page after saving
+    else:
+        form = UserProfileForm(instance=user)
+
+    return render(request, 'accounts/edit_profile.html', {'form': form})
+
+
+
+
+@login_required(login_url='login')
+def delete_profile(request):
+    if request.method == "POST":
+        password = request.POST.get("password")
+        # Verify the password
+        if not check_password(password, request.user.password):
+            messages.error(request, "Incorrect password. Account not deleted.")
+            return redirect("delete_profile")
+
+        user_email = request.user.email  # Save email for message
+        request.user.delete()  # Delete the user
+        logout(request)  # Log out the user
+        messages.success(request, f"Your account ({user_email}) has been deleted successfully.")
+        return redirect("register")  # Redirect to register or home page
+
+    return render(request, "accounts/delete_profile.html")
+
