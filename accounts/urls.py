@@ -1,4 +1,4 @@
-from .views import RegisterView, LoginView, vet_dashboard, owner_dashboard, logout_view
+from .views import RegisterView, LoginView, vet_dashboard, owner_dashboard, logout_view, profile_view
 from django.urls import path
 
 urlpatterns = [
@@ -10,5 +10,7 @@ urlpatterns = [
 
     path('vet-dashboard',vet_dashboard,name='vet_dashboard'),
 
-    path('logout',logout_view,name='logout')
+    path('logout',logout_view,name='logout'),
+
+    path('profile',profile_view,name='profile'),
 ]

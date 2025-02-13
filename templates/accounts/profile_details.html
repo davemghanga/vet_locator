@@ -1,0 +1,92 @@
+{% extends "_base.html" %}
+
+{% block title %}Profile | Vet Locator{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Your Profile</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-center">Profile Details</h5>
+                    <hr>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    {% if user.first_name %}
+                        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                    {% endif %}
+                    {% if user.last_name %}
+                        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                    {% endif %}
+                    <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+                    <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
+                    {% if user.location %}
+                        <p><strong>Location Coordinates:</strong> {{ user.location.x }}, {{ user.location.y }}</p>
+                        <p><strong>Location Name:</strong> <span id="location-name">Fetching...</span></p>
+                    {% else %}
+                        <p><strong>Location:</strong> Not provided</p>
+                    {% endif %}
+                    <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+                    
+                    <div class="text-center mt-4">
+                        {% if user.user_type == "vet" %}
+                            <a href="{% url 'vet_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                        {% else %}
+                            <a href="{% url 'owner_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.location %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const lat = "{{ user.location.y }}";
+        const lon = "{{ user.location.x }}";
+        if (lat && lon) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("location-name").innerText = data.display_name || "Unknown Location";
+                })
+                .catch(() => {
+                    document.getElementById("location-name").innerText = "Location not found";
+                });
+        }
+    });
+</script>
+{% endif %}
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Light background for contrast */
+    }
+
+    .card {
+        border-radius: 10px; /* Rounded corners for the card */
+    }
+
+    .card-title {
+        color: #007bff; /* Primary color for the title */
+    }
+
+    .btn-secondary {
+        background-color: #6c757d; /* Secondary button color */
+        border: none; /* Remove border */
+        transition: background-color 0.3s; /* Smooth transition */
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268; /* Darker shade on hover */
+    }
+
+    hr {
+        border: 1px solid #007bff; /* Blue horizontal rule */
+    }
+</style>
+{% endblock %}

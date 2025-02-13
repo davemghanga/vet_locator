@@ -14,9 +14,6 @@ class CustomUserCreationForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'phone_number', 'user_type', 'location']
-        widgets = {
-            'location': LeafletWidget(),
-        }
 
     def clean_password2(self):
         """Ensure both passwords match."""
@@ -54,9 +51,6 @@ class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['email', 'first_name', 'last_name', 'phone_number', 'user_type', 'location', 'is_active', 'is_staff']
-        widgets = {
-            'location': LeafletWidget(),
-        }
 
     def clean_password(self):
         """Return the initial password."""
@@ -64,5 +58,5 @@ class CustomUserChangeForm(forms.ModelForm):
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(label="Email Address")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)

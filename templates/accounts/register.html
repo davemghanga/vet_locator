@@ -1,18 +1,26 @@
 {% extends "_base.html" %}
 {% load crispy_forms_tags %}
-{% load leaflet_tags %}  <!-- Add this -->
+{% load leaflet_tags %}
 
 {% block title %}Register - Vet Locator{% endblock title %}
 
-{% block head %}  <!-- Add this block -->
+{% block head %}
     {{ block.super }}
     {% leaflet_js %}
     {% leaflet_css %}
     <style>
-        .leaflet-container {  /* Add custom CSS for map container */
+        .leaflet-container {
             height: 400px;
             width: 100%;
             margin-bottom: 20px;
+        }
+        .register-container {
+            background-color: #f4fcfb;  /* Soft background color */
+            padding: 20px;  /* Padding for better spacing */
+            border-radius: 5px;  /* Rounded corners */
+        }
+        .register-header {
+            margin-bottom: 20px;  /* Space between heading and form */
         }
     </style>
 {% endblock head %}
@@ -20,12 +28,16 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">  <!-- Made this wider to accommodate the map -->
+        <div class="col-md-8 register-container">  <!-- Applied background to this div -->
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white text-center">
                     <h4>Sign Up</h4>
                 </div>
                 <div class="card-body">
+                    <div class="register-header text-center">
+                        <h5>Create Your Account</h5>  <!-- New heading -->
+                        <p>Please fill in the details below to register.</p>
+                    </div>
                     <form method="post">
                         {% csrf_token %}
                         {{ form|crispy }}
