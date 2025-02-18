@@ -11,14 +11,33 @@ from pages.models import DogProfile
 
 User = get_user_model()
 
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.core.cache import cache
+from .models import CustomUser   # Make sure to import your CustomUser  model
+from .forms import CustomUserCreationForm  # Import your custom user creation form
+
 class RegisterView(CreateView):
-    model = User
+    model = CustomUser   # Use your CustomUser  model
     form_class = CustomUserCreationForm
     template_name = "accounts/register.html"
     success_url = reverse_lazy("login")
 
     def form_valid(self, form):
+        # Call the parent form_valid method to create the user
         response = super().form_valid(form)
+
+        # Check if the user is a vet and clear the cache
+        if form.cleaned_data.get('user_type') == 'vet':
+            # Extract the location from the PointField
+            location = self.object.location  # This is the PointField
+            if location:
+                lat = location.y  # Latitude
+                lon = location.x  # Longitude
+                cache_key = f"vets_near_{lat}_{lon}"
+                cache.delete(cache_key)  # Clear the cache for the relevant coordinates
+
         messages.success(self.request, "Registration successful! You can now log in.")
         return response
 

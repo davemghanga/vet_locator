@@ -1,0 +1,113 @@
+{% extends "_base.html" %}
+
+{% block title %}Find a Vet | Vet Locator{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Find a Vet Near You</h2>
+    
+    <div class="card shadow-lg p-4 mt-3">
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Finding vets near you...</p>
+        </div>
+
+        <!-- Error Message -->
+        {% if error %}
+        <div class="alert alert-danger mt-3">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- User Location -->
+        <div class="alert alert-info mt-3">
+            <strong>Your Location:</strong> 
+            {{ user_location }} ({{ user_coordinates }})
+        </div>
+
+        <!-- Nearest Vet -->
+        {% if nearest_vet %}
+        <div id="nearestVet" class="mt-4">
+            <h4>Nearest Vet</h4>
+            <div class="card mt-2 p-3 border border-primary shadow-sm square-vet-card">
+                <h5 class="text-primary">{{ nearest_vet.name }}</h5>
+                <p><strong>Location:</strong> {{ nearest_vet.location_name }}</p>
+                <p><strong>Coordinates:</strong> {{ nearest_vet.coordinates }}</p>
+                <p><strong>Distance:</strong> {{ nearest_vet.distance_km }} km away</p>
+                <a href="{% url 'vet_details' nearest_vet.id %}" class="btn btn-primary w-100">View Details</a>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-danger">No nearby vets found.</p>
+        {% endif %}
+
+        <!-- Other Vets -->
+        {% if other_vets %}
+        <div id="otherVets" class="mt-4">
+            <h4>Other Vets You May Consider</h4>
+            <div class="row">
+                {% for vet in other_vets %}
+                <div class="col-md-4 mb-3">  
+                    <div class="card p-3 h-100 shadow-sm">
+                        <h5>{{ vet.name }}</h5>
+                        <p><strong>Location:</strong> {{ vet.location_name }}</p>
+                        <p><strong>Coordinates:</strong> {{ vet.coordinates }}</p>
+                        <p><strong>Distance:</strong> {{ vet.distance_km }} km away</p>
+                        <a href="{% url 'vet_details' vet.id %}" class="btn btn-info w-100">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted">No other vets available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Bootstrap-Friendly CSS */
+    .card {
+        border-radius: 0.5rem; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+    }
+
+    .square-vet-card {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Loading Indicator */
+    #loadingIndicator {
+        margin-top: 15px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+    }
+
+    .btn-info {
+        background-color: #17a2b8 !important;
+        border-color: #17a2b8 !important;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .square-vet-card {
+            min-height: auto;
+        }
+    }
+</style>
+{% endblock %}

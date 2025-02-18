@@ -6,4 +6,11 @@ urlpatterns = [
     path('dogs/create/', views.dog_profile_create, name='dog_profile_create'),
     path('dogs/<uuid:id>/update/', views.dog_profile_update, name='dog_profile_update'),
     path('dogs/<uuid:id>/delete/', views.dog_profile_delete, name='dog_profile_delete'),
+
+    #find_vets
+    path('vets/find-vet/',views.find_vets,name='find_vets'),
+
+    #vet details
+    path('vet/<int:vet_id>/', views.vet_details, name='vet_details'),
+
 ]
