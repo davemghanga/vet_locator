@@ -9,9 +9,9 @@ from .forms import DogProfileForm
 from accounts.models import CustomUser
 from geopy.distance import geodesic
 from django.http import JsonResponse
-from geopy.exc import GeocoderTimedOut
-import logging
 from django.core.cache import cache
+from .utils import get_location_name
+import logging
 
 @login_required(login_url='login')
 def dog_profile_detail(request, id):
@@ -53,22 +53,6 @@ def dog_profile_delete(request, id):
 
 
 logger = logging.getLogger(__name__)
-
-def get_location_name(coordinates):
-    """
-    Reverse geocode coordinates to get a human-readable location name.
-    """
-    logger.debug("Received coordinates for geocoding: %s", coordinates)
-    geolocator = Nominatim(user_agent="vet_locator")
-    try:
-        location = geolocator.reverse(coordinates, exactly_one=True)
-        return location.address if location else "Unknown Location"
-    except GeocoderTimedOut:
-        logger.error("Geocoding timed out for coordinates: %s", coordinates)
-        return "Unknown Location"
-    except Exception as e:
-        logger.error("Error fetching location name: %s", e)
-        return "Unknown Location"
 
 @login_required(login_url='login')
 def find_vets(request):
@@ -154,6 +138,7 @@ def find_vets(request):
 
     logger.debug("Rendering template with context: %s", context)
     return render(request, "vets/find_vet.html", context)
+
 
 
 @login_required(login_url='login')

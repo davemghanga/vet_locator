@@ -9,7 +9,6 @@ from geopy.geocoders import Nominatim
 from django.contrib.auth.hashers import check_password
 from pages.models import DogProfile
 
-User = get_user_model()
 
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -45,6 +44,8 @@ class RegisterView(CreateView):
         messages.error(self.request, "Registration failed. Please correct the errors below.")
         return super().form_invalid(form)
 
+
+
 class LoginView(View):
     def get(self, request):
         form = LoginForm()
@@ -63,6 +64,8 @@ class LoginView(View):
             else:
                 messages.error(request, "Invalid email or password.")
         return render(request, 'accounts/login.html', {'form': form})
+
+    
 
 @login_required(login_url='login')
 def vet_dashboard(request):
