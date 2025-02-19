@@ -1,0 +1,37 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}Our Services{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Our Services</h2>
+    <p class="text-center">We provide reliable veterinary services to ensure your pet stays healthy and happy.</p>
+
+    <div class="row mt-4">
+        <!-- Service 1 -->
+        <div class="col-md-4 text-center">
+            <img src="{% static 'images/checkup.jpeg' %}" class="img-fluid rounded" alt="Checkups">
+            <h4 class="mt-3">Routine Checkups</h4>
+            <p>Regular health checkups for your pet to detect and prevent illnesses early.</p>
+        </div>
+
+        <!-- Service 2 -->
+        <div class="col-md-4 text-center">
+            <img src="{% static 'images/vaccine.jpeg' %}" class="img-fluid rounded" alt="Vaccinations">
+            <h4 class="mt-3">Vaccinations</h4>
+            <p>Essential vaccinations to protect your pet from common diseases.</p>
+        </div>
+
+        <!-- Service 3 -->
+        <div class="col-md-4 text-center">
+            <img src="{% static 'images/emergency.jpg'%}" class="img-fluid rounded" alt="Emergency Care">
+            <h4 class="mt-3">Emergency Care</h4>
+            <p>24/7 emergency services for urgent pet medical needs.</p>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url '' %}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

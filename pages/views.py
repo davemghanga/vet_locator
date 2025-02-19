@@ -12,6 +12,18 @@ from django.http import JsonResponse
 from django.core.cache import cache
 from .utils import get_location_name
 import logging
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+
+
+def contact_view(request):
+    return render(request, 'contact.html')
+
+
+def services(request):
+    return render(request, 'services.html')
 
 @login_required(login_url='login')
 def dog_profile_detail(request, id):

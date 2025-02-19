@@ -13,4 +13,8 @@ urlpatterns = [
     #vet details
     path('vet/<int:vet_id>/', views.vet_details, name='vet_details'),
 
+     path('contact/', views.contact_view, name='contact'),
+
+      path('services/', views.services, name='services'),
+
 ]
