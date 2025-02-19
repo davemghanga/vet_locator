@@ -213,12 +213,20 @@
 
         <nav class="nav-section">
             <a class="nav-link" href="{% url 'find_vets' %}"><i class="fas fa-search"></i>Find a Vet</a>
-            <a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i>Appointments</a>
+
+            {% if user.is_authenticated %}
+                {% if user.user_type == 'vet' %}
+                    <a class="nav-link" href="{% url 'vet_appointments' %}"><i class="fas fa-calendar-alt"></i>Vet Appointments</a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'appointments' %}"><i class="fas fa-calendar-alt"></i>Appointments</a>
+                {% endif %}
+            {% endif %}
+
             <a class="nav-link" href="#"><i class="fas fa-concierge-bell"></i>Services</a>
             <a class="nav-link" href="#"><i class="fas fa-envelope"></i>Contact</a>
 
             {% if user.is_authenticated %}
-                {% if user.is_vet %}
+                {% if user.user_type == 'vet' %}
                     <a class="nav-link" href="{% url 'vet_dashboard' %}"><i class="fas fa-user-md"></i>Vet Dashboard</a>
                 {% else %}
                     <a class="nav-link" href="{% url 'owner_dashboard' %}"><i class="fas fa-user"></i>User Dashboard</a>

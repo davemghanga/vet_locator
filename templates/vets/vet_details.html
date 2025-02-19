@@ -31,7 +31,8 @@
 
                     <hr>
 
-                    <a href="#" class="btn btn-success w-100 mt-3">
+                    <!-- Updated link to include vet_id -->
+                    <a href="{% url 'book_appointment' vet.id %}" class="btn btn-success w-100 mt-3">
                         <i class="fas fa-calendar-alt"></i> Book Appointment
                     </a>
                 </div>

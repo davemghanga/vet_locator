@@ -1,0 +1,68 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>My Appointments</h2>
+    {% if appointments %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Pet Owner</th>
+                    <th>Dog</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>  <!-- New column for actions -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td>
+                            {% if appointment.pet_owner.first_name or appointment.pet_owner.last_name %}
+                                {{ appointment.pet_owner.first_name }} {{ appointment.pet_owner.last_name }}
+                            {% else %}
+                                {{ appointment.pet_owner.email }}  <!-- Fallback to email if no name -->
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if appointment.dog %}
+                                {{ appointment.dog.name }}
+                            {% else %}
+                                No Specific Dog Assigned
+                            {% endif %}
+                        </td>
+                        <td>{{ appointment.date|date:"Y-m-d H:i" }}</td>
+                        <td>{{ appointment.reason }}</td>
+                        <td>{{ appointment.status }}</td>
+                        <td>
+                            {% if appointment.status == 'pending' %}
+                                <a href="{% url 'confirm_appointment' appointment.id %}" class="btn btn-success btn-sm">Confirm</a>
+                                <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger btn-sm">Cancel</a>
+                            {% elif appointment.status == 'confirmed' %}
+                                <a href="{% url 'complete_appointment' appointment.id %}" class="btn btn-primary btn-sm">Complete</a>
+                                <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger btn-sm">Cancel</a>
+                            {% elif appointment.status == 'completed' %}
+                                <span class="text-success">Completed</span>
+                            {% elif appointment.status == 'cancelled' %}
+                                <span class="text-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No appointments found.</p>
+    {% endif %}
+</div>
+
+<!-- Back to Homepage Link -->
+<div class="mt-3">
+    <a href="{% url '' %}" class="btn btn-primary">Back to Homepage</a>
+</div>
+
+{% endblock %}

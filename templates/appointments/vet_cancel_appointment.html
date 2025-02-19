@@ -1,0 +1,22 @@
+{% extends '_base.html' %}
+
+{% block title %}Cancel Appointment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Cancel Appointment</h2>
+    <p>Are you sure you want to cancel this appointment?</p>
+    <ul>
+        <li><strong>Pet Owner:</strong> {{ appointment.pet_owner.first_name }} {{ appointment.pet_owner.last_name }}</li>
+        <li><strong>Dog:</strong> {{ appointment.dog.name }}</li>
+        <li><strong>Date:</strong> {{ appointment.date|date:"Y-m-d H:i" }}</li>
+        <li><strong>Reason:</strong> {{ appointment.reason }}</li>
+    </ul>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+        <a href="{% url 'vet_appointments' %}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+{% endblock %}

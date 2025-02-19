@@ -29,6 +29,8 @@ urlpatterns = [
 
     path('pages/',include('pages.urls')),
 
+    path('vets/',include('vets.urls')),
+
 
 ]
 

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     #local apps
     'accounts.apps.AccountsConfig',
     'pages.apps.PagesConfig',
+    'vets.apps.VetsConfig',
 
     #Third party Apps
     'leaflet',

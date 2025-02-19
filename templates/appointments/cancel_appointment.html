@@ -1,0 +1,23 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cancel Appointment{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Cancel Appointment</h2>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to cancel the appointment with Dr. {{ appointment.vet.get_full_name }} on {{ formatted_date}}?</p>
+            <p><strong>Reason for Appointment:</strong> {{ appointment.reason }}</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Cancel Appointment</button>
+                <a href="{% url 'appointments' %}" class="btn btn-secondary">No, Go Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
