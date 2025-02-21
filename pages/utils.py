@@ -1,6 +1,7 @@
 import logging
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -19,3 +20,6 @@ def get_location_name(coordinates):
     except Exception as e:
         logger.error("Error fetching location name: %s", e)
         return "Unknown Location"
+    
+
+

@@ -31,6 +31,8 @@ urlpatterns = [
 
     path('vets/',include('vets.urls')),
 
+    path('recommendations/',include('recommendations.urls')),
+
 
 ]
 

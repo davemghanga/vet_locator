@@ -17,6 +17,12 @@ from django.core.cache import cache
 from .models import CustomUser   # Make sure to import your CustomUser  model
 from .forms import CustomUserCreationForm  # Import your custom user creation form
 
+import random
+import string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.forms import SetPasswordForm
+
 class RegisterView(CreateView):
     model = CustomUser   # Use your CustomUser  model
     form_class = CustomUserCreationForm
@@ -137,4 +143,53 @@ def delete_profile(request):
         return redirect("register")  # Redirect to register or home page
 
     return render(request, "accounts/delete_profile.html")
+
+
+
+def generate_reset_code(length=6):
+    """Generate a random password reset code."""
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+
+def password_reset_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = CustomUser.objects.get(email=email)
+            # Generate a reset code
+            reset_code = generate_reset_code()
+            # Save the reset code in the session
+            request.session['reset_code'] = reset_code
+            request.session['user_id'] = user.id
+            
+            # Send email with the reset code
+            subject = "Password Reset Code"
+            message = f"Your password reset code is: {reset_code}"
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            
+            messages.success(request, "A password reset code has been sent to your email.")
+            return redirect('password_reset_confirm')
+        except CustomUser.DoesNotExist:
+            messages.error(request, "No user is associated with this email address.")
+    return render(request, 'accounts/password_reset_request.html')
+
+
+def password_reset_confirm(request):
+    if request.method == "POST":
+        entered_code = request.POST.get("code")
+        new_password = request.POST.get("new_password")
+        
+        # Check if the entered code matches the one in the session
+        if entered_code == request.session.get('reset_code'):
+            user_id = request.session.get('user_id')
+            user = CustomUser.objects.get(id=user_id)
+            form = SetPasswordForm(user, {'new_password': new_password})
+            if form.is_valid():
+                user = form.save()
+                messages.success(request, "Your password has been set. You can now log in.")
+                return redirect('login')
+        else:
+            messages.error(request, "The reset code is invalid.")
+    
+    return render(request, 'accounts/password_reset_confirm.html')
 

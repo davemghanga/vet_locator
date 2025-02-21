@@ -1,0 +1,235 @@
+{% extends "_base.html" %}
+
+{% block title %}Get Recommendations{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Pet Health Recommendations</h1>
+    
+    <!-- Input Form -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <form id="recommendation-form" method="POST" onsubmit="showLoading();">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="problem" class="form-label">Describe your pet's problem:</label>
+                    <textarea 
+                        id="problem"
+                        name="problem" 
+                        class="form-control" 
+                        placeholder="Please describe the symptoms or issues you've noticed..." 
+                        required
+                    ></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Get Recommendation</button>
+            </form>
+
+            <div id="loading" class="text-center mt-3" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Generating recommendation...</p>
+            </div>
+        </div>
+    </div>
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+
+    <!-- Previous Recommendations -->
+    {% if user_problems %}
+        <h2 class="mt-5 mb-4">Previous Problems and Recommendations</h2>
+        {% for problem in user_problems %}
+            <div class="card mb-4 shadow-sm recommendation-card">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-paw me-2"></i>
+                        Problem: {{ problem.problem_description }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="recommendation-content">
+                        {{ problem.recommendation|linebreaks }}
+                    </div>
+                    <hr>
+                    <div class="text-muted">
+                        <small>Created on: {{ problem.created_at|date:"F j, Y, g:i a" }}</small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<style>
+    /* Form Styles */
+    .form-control {
+        height: 150px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 1rem;
+        font-size: 1rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    /* Card Styles */
+    .recommendation-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .recommendation-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header {
+        border-bottom: none;
+    }
+
+    /* Content Formatting */
+    .recommendation-content {
+        white-space: pre-line;
+        line-height: 1.8;
+        color: #2c3e50;
+    }
+
+    .recommendation-content h3 {
+        color: #2c3e50;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .recommendation-content h4 {
+        color: #34495e;
+        margin-top: 1.25rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .recommendation-content ul,
+    .recommendation-content ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .recommendation-content li {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+    }
+
+    .recommendation-content p {
+        margin-bottom: 1rem;
+        line-height: 1.8;
+    }
+
+    /* Section Headers */
+    .section-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Loading Spinner */
+    #loading {
+        margin: 2rem 0;
+    }
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+
+        .recommendation-content {
+            font-size: 0.95rem;
+        }
+    }
+
+    /* Custom Scrollbar */
+    .recommendation-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .recommendation-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .recommendation-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .recommendation-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Additional Typography Improvements */
+    .recommendation-content strong,
+    .recommendation-content b {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .recommendation-content em {
+        color: #34495e;
+    }
+
+    /* Highlight Important Information */
+    .recommendation-content .important-note {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+
+    /* Warning Signs Section */
+    .recommendation-content .warning-signs {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('recommendation-form').style.opacity = '0.5';
+    }
+
+    // Reset form opacity after submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('recommendation-form');
+        form.addEventListener('submit', function() {
+            setTimeout(function() {
+                form.style.opacity = '1';
+            }, 100);
+        });
+    });
+</script>
+{% endblock %}

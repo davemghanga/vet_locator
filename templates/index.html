@@ -223,6 +223,7 @@
             {% endif %}
 
             <a class="nav-link" href="{% url 'services' %}"><i class="fas fa-concierge-bell"></i>Services</a>
+            <a class="nav-link" href="{% url 'recommend_solution' %}"><i class="fas fa-lightbulb"></i>Recommendations</a>
             <a class="nav-link" href="{% url 'contact' %}"><i class="fas fa-envelope"></i>Contact</a>
 
             {% if user.is_authenticated %}

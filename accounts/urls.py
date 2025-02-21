@@ -1,21 +1,25 @@
-from .views import RegisterView, LoginView, vet_dashboard, owner_dashboard, logout_view, profile_view, edit_profile, delete_profile
+from . import views
 from django.urls import path
 
 urlpatterns = [
-    path('register',RegisterView.as_view(),name='register'),
+    path('register',views.RegisterView.as_view(),name='register'),
 
-    path('login',LoginView.as_view(),name='login'),
+    path('login',views.LoginView.as_view(),name='login'),
 
-    path('owner-dashboard',owner_dashboard,name='owner_dashboard'),
+    path('owner-dashboard',views.owner_dashboard,name='owner_dashboard'),
 
-    path('vet-dashboard',vet_dashboard,name='vet_dashboard'),
+    path('vet-dashboard',views.vet_dashboard,name='vet_dashboard'),
 
-    path('logout',logout_view,name='logout'),
+    path('logout',views.logout_view,name='logout'),
 
-    path('profile',profile_view,name='profile'),
+    path('profile',views.profile_view,name='profile'),
 
-    path('user-profile',edit_profile,name='edit_profile'),
+    path('user-profile',views.edit_profile,name='edit_profile'),
 
-    path('delete-profile',delete_profile,name='delete_profile'),
+    path('delete-profile',views.delete_profile,name='delete_profile'),
+
+     path('password_reset/', views.password_reset_request, name='password_reset_request'),
+     
+    path('password_reset_confirm/', views.password_reset_confirm, name='password_reset_confirm'),
 
 ]

@@ -14,9 +14,11 @@ from .utils import get_location_name
 import logging
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.conf import settings
-
+import google.generativeai as genai
+from django.conf import settings
+from django.shortcuts import render
+from django.http import JsonResponse
 
 def contact_view(request):
     return render(request, 'contact.html')
@@ -191,4 +193,8 @@ def vet_details(request, vet_id):
     cache.set(cache_key, context, timeout=300)  # Cache for 5 minutes
 
     return render(request, "vets/vet_details.html", context)
+
+
+
+
 
