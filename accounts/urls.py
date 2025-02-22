@@ -18,8 +18,10 @@ urlpatterns = [
 
     path('delete-profile',views.delete_profile,name='delete_profile'),
 
-     path('password_reset/', views.password_reset_request, name='password_reset_request'),
-     
-    path('password_reset_confirm/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('password_reset/', views.password_reset_request, name='password_reset_request'),
+
+    path('password_reset_confirm/<int:user_id>/', views.password_reset_confirm, name='password_reset_confirm'),
+
+    path("password_change/", views.password_change, name='password_change'),
 
 ]

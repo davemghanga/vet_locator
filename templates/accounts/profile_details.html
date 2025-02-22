@@ -5,34 +5,46 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card shadow-lg border-primary">
                 <div class="card-header bg-primary text-white text-center">
                     <h4>Your Profile</h4>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title text-center">Profile Details</h5>
-                    <hr>
-                    <p><strong>Email:</strong> {{ user.email }}</p>
-                    {% if user.first_name %}
-                        <p><strong>First Name:</strong> {{ user.first_name }}</p>
-                    {% endif %}
-                    {% if user.last_name %}
-                        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-                    {% endif %}
-                    <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
-                    <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
-                    {% if user.location %}
-                        <p><strong>Location Coordinates:</strong> {{ user.location.x }}, {{ user.location.y }}</p>
-                        <p><strong>Location Name:</strong> <span id="location-name">Fetching...</span></p>
-                    {% else %}
-                        <p><strong>Location:</strong> Not provided</p>
-                    {% endif %}
-                    <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+                    <h5 class="card-title text-center mb-4">Profile Details</h5>
+                    <hr class="mb-4">
 
+                    <!-- Profile Details -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            {% if user.first_name %}
+                                <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                            {% endif %}
+                            {% if user.last_name %}
+                                <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                            {% endif %}
+                            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+                            <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if user.location %}
+                                <p><strong>Location Coordinates:</strong> {{ user.location.x }}, {{ user.location.y }}</p>
+                                <p><strong>Location Name:</strong> <span id="location-name">Fetching...</span></p>
+                            {% else %}
+                                <p><strong>Location:</strong> Not provided</p>
+                            {% endif %}
+                            <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
                     <div class="text-center mt-4">
                         <a href="{% url 'edit_profile' %}" class="btn btn-primary me-2">
                             ✏️ Edit Profile
+                        </a>
+                        <a href="{% url 'password_change' %}" class="btn btn-warning me-2">
+                            🔑 Change Password
                         </a>
                         {% if user.user_type == "vet" %}
                             <a href="{% url 'vet_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
@@ -46,6 +58,7 @@
     </div>
 </div>
 
+<!-- Fetch Location Name -->
 {% if user.location %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -65,17 +78,24 @@
 </script>
 {% endif %}
 
+<!-- Custom Styles -->
 <style>
     body {
         background-color: #f8f9fa; /* Light background for contrast */
     }
 
     .card {
-        border-radius: 10px; /* Rounded corners for the card */
+        border-radius: 15px; /* Rounded corners for the card */
+        border: none;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0; /* Rounded top corners */
     }
 
     .card-title {
         color: #007bff; /* Primary color for the title */
+        font-weight: bold;
     }
 
     .btn-primary {
@@ -86,6 +106,16 @@
 
     .btn-primary:hover {
         background-color: #0056b3; /* Darker blue on hover */
+    }
+
+    .btn-warning {
+        background-color: #ffc107; /* Yellow for password change */
+        border: none;
+        transition: background-color 0.3s;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800; /* Darker yellow on hover */
     }
 
     .btn-secondary {
@@ -100,6 +130,15 @@
 
     hr {
         border: 1px solid #007bff; /* Blue horizontal rule */
+        opacity: 0.5;
+    }
+
+    .card-body p {
+        margin-bottom: 0.75rem; /* Spacing between profile details */
+    }
+
+    .card-body strong {
+        color: #343a40; /* Dark color for labels */
     }
 </style>
 {% endblock %}

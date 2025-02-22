@@ -1,55 +1,31 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout, get_user_model, authenticate, login
+from django.contrib.auth import logout, authenticate, login
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, View
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import LoginForm, CustomUserCreationForm, UserProfileForm
 from geopy.geocoders import Nominatim
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from pages.models import DogProfile
+from .models import CustomUser
+from .forms import PasswordChangeForm
 
-
-from django.contrib import messages
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
-from django.core.cache import cache
-from .models import CustomUser   # Make sure to import your CustomUser  model
-from .forms import CustomUserCreationForm  # Import your custom user creation form
-
-import random
-import string
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib.auth.forms import SetPasswordForm
 
 class RegisterView(CreateView):
-    model = CustomUser   # Use your CustomUser  model
+    model = CustomUser
     form_class = CustomUserCreationForm
     template_name = "accounts/register.html"
     success_url = reverse_lazy("login")
 
     def form_valid(self, form):
-        # Call the parent form_valid method to create the user
         response = super().form_valid(form)
-
-        # Check if the user is a vet and clear the cache
-        if form.cleaned_data.get('user_type') == 'vet':
-            # Extract the location from the PointField
-            location = self.object.location  # This is the PointField
-            if location:
-                lat = location.y  # Latitude
-                lon = location.x  # Longitude
-                cache_key = f"vets_near_{lat}_{lon}"
-                cache.delete(cache_key)  # Clear the cache for the relevant coordinates
-
         messages.success(self.request, "Registration successful! You can now log in.")
         return response
 
     def form_invalid(self, form):
         messages.error(self.request, "Registration failed. Please correct the errors below.")
         return super().form_invalid(form)
-
 
 
 class LoginView(View):
@@ -71,21 +47,24 @@ class LoginView(View):
                 messages.error(request, "Invalid email or password.")
         return render(request, 'accounts/login.html', {'form': form})
 
-    
 
 @login_required(login_url='login')
 def vet_dashboard(request):
     return render(request, "accounts/vet_dashboard.html")
+
 
 @login_required(login_url='login')
 def owner_dashboard(request):
     profiles = DogProfile.objects.filter(owner=request.user)
     return render(request, "accounts/owner_dashboard.html", {"profiles": profiles})
 
+
+@login_required(login_url='login')
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
     return redirect(reverse_lazy(''))
+
 
 def get_location_name(coordinates):
     geolocator = Nominatim(user_agent="vet_locator")
@@ -95,6 +74,7 @@ def get_location_name(coordinates):
     except Exception:
         return "Unknown Location"
 
+
 @login_required(login_url='login')
 def profile_view(request):
     user = request.user
@@ -102,7 +82,6 @@ def profile_view(request):
 
     if user.location:
         try:
-            # Convert the POINT(x y) format to lat, lon
             location_str = str(user.location).replace("POINT(", "").replace(")", "")
             lon, lat = map(float, location_str.split())
             location_name = get_location_name((lat, lon))
@@ -110,6 +89,7 @@ def profile_view(request):
             location_name = "Invalid location data."
 
     return render(request, "accounts/profile_details.html", {"location_name": location_name})
+
 
 @login_required(login_url='login')
 def edit_profile(request):
@@ -125,13 +105,10 @@ def edit_profile(request):
     return render(request, 'accounts/edit_profile.html', {'form': form})
 
 
-
-
 @login_required(login_url='login')
 def delete_profile(request):
     if request.method == "POST":
         password = request.POST.get("password")
-        # Verify the password
         if not check_password(password, request.user.password):
             messages.error(request, "Incorrect password. Account not deleted.")
             return redirect("delete_profile")
@@ -142,54 +119,77 @@ def delete_profile(request):
         messages.success(request, f"Your account ({user_email}) has been deleted successfully.")
         return redirect("register")  # Redirect to register or home page
 
-    return render(request, "accounts/delete_profile.html")
-
-
-
-def generate_reset_code(length=6):
-    """Generate a random password reset code."""
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
-
 
 def password_reset_request(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email")  # Get the email from the form
+        security_question = request.POST.get("security_question")  # Get the security question from the form
+        security_answer = request.POST.get("security_answer")  # Get the security answer from the form
+
+        # Rate limiting: Check if the user has exceeded the maximum attempts
+        reset_attempts = request.session.get('reset_attempts', 0)
+        if reset_attempts >= 3:
+            messages.error(request, "Too many attempts. Please try again later.")
+            return redirect('password_reset_request')
+
         try:
+            # Attempt to find the user based on the email
             user = CustomUser.objects.get(email=email)
-            # Generate a reset code
-            reset_code = generate_reset_code()
-            # Save the reset code in the session
-            request.session['reset_code'] = reset_code
-            request.session['user_id'] = user.id
-            
-            # Send email with the reset code
-            subject = "Password Reset Code"
-            message = f"Your password reset code is: {reset_code}"
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            
-            messages.success(request, "A password reset code has been sent to your email.")
-            return redirect('password_reset_confirm')
+
+            # Check if the security question and answer match
+            if (user.security_question == security_question and
+                    check_password(security_answer, user.security_answer)):
+                request.session['reset_attempts'] = 0  # Reset attempts on success
+                return redirect('password_reset_confirm', user_id=user.id)
+            else:
+                request.session['reset_attempts'] = reset_attempts + 1
+                messages.error(request, "Invalid security question or answer.")
+                return redirect('password_reset_request')
+
         except CustomUser.DoesNotExist:
-            messages.error(request, "No user is associated with this email address.")
+            messages.error(request, "No account is associated with this email address.")
+            return redirect('password_reset_request')
+
+    # If GET request, render the form to enter email, security question, and security answer
     return render(request, 'accounts/password_reset_request.html')
 
 
-def password_reset_confirm(request):
+def password_reset_confirm(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
     if request.method == "POST":
-        entered_code = request.POST.get("code")
         new_password = request.POST.get("new_password")
-        
-        # Check if the entered code matches the one in the session
-        if entered_code == request.session.get('reset_code'):
-            user_id = request.session.get('user_id')
-            user = CustomUser.objects.get(id=user_id)
-            form = SetPasswordForm(user, {'new_password': new_password})
-            if form.is_valid():
-                user = form.save()
-                messages.success(request, "Your password has been set. You can now log in.")
-                return redirect('login')
-        else:
-            messages.error(request, "The reset code is invalid.")
-    
-    return render(request, 'accounts/password_reset_confirm.html')
+        confirm_password = request.POST.get("confirm_password")
 
+        # Check if the new password and confirm password match
+        if new_password == confirm_password:
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, "Your password has been reset successfully. You can now log in.")
+            return redirect('login')
+        else:
+            messages.error(request, "The passwords do not match.")
+            return redirect('password_reset_confirm', user_id=user.id)
+
+    return render(request, 'accounts/password_reset_confirm.html', {'user': user})
+
+
+@login_required(login_url='login')
+def password_change(request):
+    if request.method == "POST":
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            # Set the new password
+            new_password = form.cleaned_data["new_password"]
+            request.user.set_password(new_password)
+            request.user.save()
+
+            # Log the user back in (since their session is invalidated after password change)
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+
+            messages.success(request, "Your password has been changed successfully.")
+            return redirect("profile")  # Redirect to the user's profile or dashboard
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, "accounts/password_change.html", {"form": form})

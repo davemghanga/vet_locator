@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import CustomUser
+from .models import CustomUser 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.gis.admin import GISModelAdmin
 
-
 class CustomUserAdmin(BaseUserAdmin, GISModelAdmin):
-    model = CustomUser
+    model = CustomUser 
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
 
@@ -15,15 +14,15 @@ class CustomUserAdmin(BaseUserAdmin, GISModelAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('first_name', 'last_name', 'phone_number', 'location')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'phone_number', 'location', 'security_question', 'security_answer')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
-        ('User Type', {'fields': ('user_type',)}),
+        ('User  Type', {'fields': ('user_type',)}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'user_type', 'first_name', 'last_name', 'phone_number', 'location', 'is_staff', 'is_active'),
+            'fields': ('email', 'password1', 'password2', 'user_type', 'first_name', 'last_name', 'phone_number', 'location', 'security_question', 'security_answer', 'is_staff', 'is_active'),
         }),
     )
 
@@ -31,5 +30,4 @@ class CustomUserAdmin(BaseUserAdmin, GISModelAdmin):
     ordering = ('email',)
     filter_horizontal = ('groups', 'user_permissions',)
 
-admin.site.register(CustomUser, CustomUserAdmin)
-
+admin.site.register(CustomUser , CustomUserAdmin)
