@@ -146,7 +146,8 @@
         .text-muted {
             font-size: 1.2rem;
             margin-bottom: 3vh;
-            color: white;
+            color: #483D8B !important;  /* Dark slate blue */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
         .btn-lg {
@@ -204,9 +205,9 @@
         <main class="main-content">
             <div class="text-section">
                 <i class="fas fa-paw paw-icon"></i>
-                <h1 class="fw-bold">Doing The Right Thing, At The Right Time</h1>
+                <h1 class="fw-bold">We care about your Paw Companion</h1>
                 <p class="text-muted">Helping pet owners connect with reliable veterinarians quickly and easily.</p>
-                <a href="#" class="btn btn-primary btn-lg">Learn More</a>
+                <a href="{% url 'services'%}" class="btn btn-primary btn-lg">Learn More</a>
             </div>
             <img src="{% static 'images/dogprofile.jpeg' %}" alt="Happy Dog" class="dog-image">
         </main>

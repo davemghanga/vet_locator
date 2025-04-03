@@ -22,7 +22,7 @@ class CustomUserCreationForm(forms.ModelForm):
     ]
 
     security_question = forms.ChoiceField(choices=SECURITY_QUESTIONS, label="Security Question")
-    security_answer = forms.CharField(max_length=255, label="Security Answer", widget=forms.PasswordInput)  # Mask security answer input
+    security_answer = forms.CharField(max_length=255, label="Security Answer",)  # Mask security answer input
 
     class Meta:
         model = CustomUser
