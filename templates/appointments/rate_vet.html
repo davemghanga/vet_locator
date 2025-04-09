@@ -1,0 +1,54 @@
+{% extends '_base.html' %}
+
+{% block title %}Rate Your Vet{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Rate the Service for {{ appointment.dog.name }}</h2>
+    <p>Please provide your feedback for the services provided by the vet.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Star Rating -->
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5" {% if form.rating.value == '5' %}checked{% endif %}>
+            <label for="star5"></label>
+            <input type="radio" id="star4" name="rating" value="4" {% if form.rating.value == '4' %}checked{% endif %}>
+            <label for="star4"></label>
+            <input type="radio" id="star3" name="rating" value="3" {% if form.rating.value == '3' %}checked{% endif %}>
+            <label for="star3"></label>
+            <input type="radio" id="star2" name="rating" value="2" {% if form.rating.value == '2' %}checked{% endif %}>
+            <label for="star2"></label>
+            <input type="radio" id="star1" name="rating" value="1" {% if form.rating.value == '1' %}checked{% endif %}>
+            <label for="star1"></label>
+        </div>
+
+        <!-- Comment Section -->
+        <div class="form-group">
+            {{ form.comment }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Rating</button>
+    </form>
+    <a href="{% url 'appointments' %}" class="btn btn-secondary mt-3">Back to Profile</a>
+</div>
+{% endblock %}
+
+<script>
+    const stars = document.querySelectorAll('.star-rating input');
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function () {
+            const starId = parseInt(this.value);
+            for (let i = 0; i < starId; i++) {
+                stars[i].previousElementSibling.style.color = '#FFD700';  // Highlight stars on hover
+            }
+        });
+        star.addEventListener('mouseout', function () {
+            const starId = parseInt(this.value);
+            for (let i = 0; i < stars.length; i++) {
+                stars[i].previousElementSibling.style.color = '#ddd';  // Reset star color after hover
+            }
+        });
+    });
+</script>

@@ -1,0 +1,32 @@
+/* Style for the star rating */
+.star-rating {
+    direction: rtl;
+    display: inline-block;
+    font-size: 2rem;
+    unicode-bidi: bidi-override;
+    color: #ddd;
+    cursor: pointer;
+}
+
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    display: inline-block;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.star-rating label::before {
+    content: '\2605';  /* Unicode star symbol */
+}
+
+.star-rating input[type="radio"]:checked ~ label::before {
+    color: #FFD700;  /* Gold for checked stars */
+}
+
+.star-rating input[type="radio"]:checked ~ label:hover::before {
+    color: #FFD700;  /* Highlighting star on hover */
+}

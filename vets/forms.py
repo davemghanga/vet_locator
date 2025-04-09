@@ -4,6 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Submit
 from .models import Appointment
 from pages.models import DogProfile
+from .models import Rating
 
 class AppointmentForm(forms.ModelForm):
     class Meta:
@@ -40,3 +41,31 @@ class AppointmentForm(forms.ModelForm):
             Field('reason'),
             Submit('submit', 'Book Appointment', css_class='btn btn-primary mt-3')
         )
+
+class VetVisitForm(forms.Form):
+    diagnosis = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        label="Diagnosis",
+        required=True
+    )
+    treatment = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        label="Treatment Given",
+        required=True
+    )
+
+
+
+from django import forms
+from .models import Rating
+
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rating', 'comment']
+
+    rating = forms.ChoiceField(
+        choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')],
+        widget=forms.RadioSelect(attrs={'class': 'star-rating'})
+    )
+

@@ -118,6 +118,9 @@ def delete_profile(request):
         logout(request)  # Log out the user
         messages.success(request, f"Your account ({user_email}) has been deleted successfully.")
         return redirect("register")  # Redirect to register or home page
+    
+    # Handle GET request by rendering a template
+    return render(request, 'accounts/delete_profile.html')
 
 
 def password_reset_request(request):

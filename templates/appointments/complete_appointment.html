@@ -18,5 +18,10 @@
         <button type="submit" class="btn btn-primary">Complete</button>
         <a href="{% url 'vet_appointments' %}" class="btn btn-secondary">Cancel</a>
     </form>
+
+    <!-- Link to Add Vet Visit Details -->
+    <p class="mt-3">
+        <a href="{% url 'record_vet_visit' appointment.dog.id appointment.id %}" class="btn btn-info">Add Visit Details</a>
+    </p>
 </div>
 {% endblock %}

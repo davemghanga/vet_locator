@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from pages.models import DogProfile
+from django.conf import settings
 
 User  = get_user_model()
 
@@ -70,3 +71,15 @@ def clean(self):
     
     if overlapping_appointments.exists():
         raise ValidationError(_('This vet is already booked for the selected time.'))
+    
+
+class Rating(models.Model):
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE)
+    pet_owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    vet = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ratings_given')
+    rating = models.PositiveIntegerField(choices=[(1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')])
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Rating for {self.vet} by {self.pet_owner} - {self.rating} stars"
