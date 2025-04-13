@@ -13,9 +13,14 @@ urlpatterns = [
     #vet details
     path('vet/<int:vet_id>/', views.vet_details, name='vet_details'),
 
-     path('contact/', views.contact_view, name='contact'),
+    path('contact/', views.contact_view, name='contact'),
 
-      path('services/', views.services, name='services'),
+  path('services/', views.services, name='services'),
+
+
+   path('vet/<int:vet_id>/reviews/', views.vet_reviews, name='vet_reviews'),
+
+
 
 
 ]

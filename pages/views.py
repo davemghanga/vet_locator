@@ -19,6 +19,8 @@ import google.generativeai as genai
 from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.db.models import Avg
+from vets.models import Rating 
 
 def contact_view(request):
     return render(request, 'contact.html')
@@ -154,7 +156,6 @@ def find_vets(request):
     return render(request, "vets/find_vet.html", context)
 
 
-
 @login_required(login_url='login')
 def vet_details(request, vet_id):
     # Create a unique cache key for the vet details
@@ -164,35 +165,50 @@ def vet_details(request, vet_id):
     if cached_vet_details is not None:
         return render(request, "vets/vet_details.html", cached_vet_details)
 
-    vet = get_object_or_404(CustomUser , id=vet_id, user_type='vet')  # Ensure it's a vet
+    vet = get_object_or_404(CustomUser, id=vet_id, user_type='vet')
 
-    # Get the user's location
+    # Ensure the user has location data
     user = request.user
     if user.location is None:
-        return render(request, "vets/vet_details.html", {"error": "User  location not set."})
+        return render(request, "vets/vet_details.html", {"error": "User location not set."})
 
-    lat = user.location.y  # User's latitude
-    lon = user.location.x  # User's longitude
-
-    # Calculate distance to the vet
-    vet_coordinates = (vet.location.y, vet.location.x)  # Vet's coordinates
+    # Coordinates
+    lat = user.location.y
+    lon = user.location.x
+    vet_coordinates = (vet.location.y, vet.location.x)
     distance = round(geodesic((lat, lon), vet_coordinates).km, 2)
-
-    # Get the location name for the vet
     location_name = get_location_name(vet_coordinates)
 
-    # Prepare the context for rendering
+    # Ratings
+    ratings = Rating.objects.filter(vet=vet)
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg'] or 0
+    rating_count = ratings.count()
+
     context = {
         "vet": vet,
         "distance": distance,
         "coordinates": f"{vet_coordinates[0]}, {vet_coordinates[1]}",
-        "location_name": location_name
+        "location_name": location_name,
+        "average_rating": round(average_rating, 1),
+        "rating_count": rating_count,
     }
 
-    # Cache the result for future requests
-    cache.set(cache_key, context, timeout=300)  # Cache for 5 minutes
+    # Cache the result for 5 minutes
+    cache.set(cache_key, context, timeout=300)
 
     return render(request, "vets/vet_details.html", context)
+
+
+
+@login_required(login_url='login')
+def vet_reviews(request, vet_id):
+    vet = get_object_or_404(CustomUser, id=vet_id, user_type='vet')
+    reviews = Rating.objects.filter(vet=vet).select_related('pet_owner', 'appointment')  # Get reviews with related pet_owner and appointment
+
+    return render(request, 'vets/vet_reviews.html', {'vet': vet, 'reviews': reviews})
+
+
+
 
 
 

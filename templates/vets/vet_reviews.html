@@ -1,0 +1,57 @@
+{% extends "_base.html" %}
+{% load range_filter %}
+
+{% block title %}Reviews for {{ vet.first_name }} {{ vet.last_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Reviews for {{ vet.first_name }} {{ vet.last_name }}</h2>
+
+    {% for review in reviews %}
+    <div class="review-card mb-3 p-3 border rounded">
+        <h5>{{ review.pet_owner.first_name }} {{ review.pet_owner.last_name }}</h5>
+        <div class="rating">
+            {% for i in review.rating|range_filter %}
+                <span class="star filled">&#9733;</span>  <!-- Filled star -->
+            {% endfor %}
+            {% for i in 5|range_filter %}
+                {% if i >= review.rating %}
+                    <span class="star">&#9734;</span>  <!-- Empty star -->
+                {% endif %}
+            {% endfor %}
+            <span class="ml-2">{{ review.rating }} / 5</span>
+        </div>
+        <p><strong>Comment:</strong> {{ review.comment }}</p>
+        <p><strong>Appointment:</strong> {{ review.appointment.date|date:"Y-m-d H:i" }}</p>
+    </div>
+    {% empty %}
+        <p>No reviews yet.</p>
+    {% endfor %}
+</div>
+
+<style>
+    .star {
+        font-size: 1.5rem;
+        color: #FFD700;  /* Gold for filled stars */
+    }
+    .star.filled {
+        color: #FFD700;  /* Gold for filled stars */
+    }
+    .star {
+        color: #ccc;  /* Grey for empty stars */
+    }
+    .review-card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #f9f9f9;
+    }
+    .review-card h5 {
+        font-size: 1.25rem;
+    }
+    .rating {
+        display: inline-block;
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}

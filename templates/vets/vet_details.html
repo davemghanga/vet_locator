@@ -1,4 +1,5 @@
 {% extends "_base.html" %}
+{% load extras %}
 
 {% block title %}Vet Details | {{ vet.first_name }} {{ vet.last_name }}{% endblock %}
 
@@ -8,12 +9,30 @@
         <div class="col-md-8">
             <div class="card shadow-lg p-4">
                 <div class="card-body text-center">
-                    <h2 class="card-title text-primary">{{ vet.first_name }} {{ vet.last_name }}</h2>  <!-- Displaying the vet's name -->
-                    
+                    <h2 class="card-title text-primary">{{ vet.first_name }} {{ vet.last_name }}</h2>
+
+                    <!-- Star Rating -->
+                    {% if average_rating %}
+                        <div class="mb-2 text-warning" style="font-size: 1.4rem;">
+                            {% for i in 1|to_range:5 %}
+                                {% if i <= average_rating %}
+                                    <i class="fas fa-star"></i>
+                                {% elif i <= average_rating|add:"0.5" %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-dark">({{ average_rating|floatformat:1 }} / 5)</span>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No ratings yet.</p>
+                    {% endif %}
+
                     <hr>
 
                     <p class="text-muted"><strong>Location:</strong> <i class="fas fa-map-marker-alt"></i> {{ location_name }}</p>
-                    <p class="text-muted"><strong>Coordinates:</strong> <i class="fas fa-coordinates"></i> {{ coordinates }}</p>
+                    <p class="text-muted"><strong>Coordinates:</strong> <i class="fas fa-crosshairs"></i> {{ coordinates }}</p>
                     <p class="text-muted"><strong>Distance:</strong> <i class="fas fa-road"></i> {{ distance }} km away</p>
 
                     <hr>
@@ -30,8 +49,11 @@
                     </div>
 
                     <hr>
+                    <a href="{% url 'vet_reviews' vet.id %}" class="btn btn-outline-primary w-100 mt-3">
+                        <i class="fas fa-comments"></i> Read All Reviews
+                    </a>
+                    
 
-                    <!-- Updated link to include vet_id -->
                     <a href="{% url 'book_appointment' vet.id %}" class="btn btn-success w-100 mt-3">
                         <i class="fas fa-calendar-alt"></i> Book Appointment
                     </a>
